@@ -1,0 +1,43 @@
+function applyFormatting() {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheets = spreadsheet.getSheets();
+  
+  for (var s = 0; s < sheets.length; s++) {
+    var sheet = sheets[s];
+    var sheetName = sheet.getName();
+    
+    if (sheetName !== 'Sheet1') {
+      var sheet1 = spreadsheet.getSheetByName('Sheet1');
+      var dataSheet1 = sheet1.getDataRange().getValues();
+      var dataSheet = sheet.getDataRange().getValues();
+      
+      for (var i = 1; i < dataSheet.length; i++) {
+        var row = dataSheet[i];
+        
+        for (var j = 1; j < dataSheet1.length; j++) {
+          var compareRow = dataSheet1[j];
+          
+          if (compareRow.join() === row.join()) {
+            sheet.getRange(i + 1, 1, 1, row.length)
+              .setFontLine("line-through")
+              .setBackgroundRGB(211, 211, 211);
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
+function createTrigger() {
+  var triggers = ScriptApp.getProjectTriggers();
+  
+  for (var i = 0; i < triggers.length; i++) {
+    ScriptApp.deleteTrigger(triggers[i]);
+  }
+  
+  ScriptApp.newTrigger('applyFormatting')
+    .timeBased()
+    .everyMinutes(1)
+    .create();
+}
